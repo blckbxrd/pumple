@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre Rojo Fluido</title>
+    <style>
+        :root {
+            --rojo-fondo: #6a040f;
+            --rojo-tapa: #9d0208;
+            --rojo-frente: #800000;
+            --dorado: #d4af37;
+            --beige: #fff9ed;
+            /* Curva de aceleración natural */
+            --suave: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #d1d1d1;
+            font-family: 'Georgia', serif;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            perspective: 1000px;
+        }
+
+        .envelope-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--rojo-fondo);
+            border-radius: 0 0 8px 8px;
+            z-index: 1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .flap {
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 115px solid var(--rojo-tapa);
+            transform-origin: top;
+            /* Transición fluida para el cierre */
+            transition: transform 0.6s var(--suave), z-index 0.3s step-end;
+            z-index: 5;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+        }
+
+        .envelope-front {
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid var(--rojo-frente);
+            border-right: 160px solid var(--rojo-frente);
+            border-top: 110px solid transparent;
+            border-bottom: 110px solid var(--rojo-frente);
+            z-index: 4; 
+            border-radius: 0 0 8px 8px;
+        }
+
+        .seal {
+            position: absolute;
+            bottom: 82px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 55px;
+            height: 55px;
+            background: radial-gradient(circle, var(--dorado) 60%, #b8860b 100%);
+            border-radius: 50%;
+            z-index: 6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 26px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            transition: opacity 0.3s;
+        }
+
+        .letter {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            width: 280px;
+            height: 190px;
+            background-color: var(--beige);
+            z-index: 2;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            overflow-y: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- ANIMACIONES DE FLUJO --- */
+        
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+            transition: transform 0.6s var(--suave), z-index 0.3s step-start;
+        }
+
+        .envelope-wrapper.open .seal {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .envelope-wrapper.open .letter {
+            animation: openLetter 1.2s var(--suave) forwards;
+        }
+
+        @keyframes openLetter {
+            0% { transform: translateY(0); z-index: 2; }
+            50% { transform: translateY(-215px); z-index: 2; }
+            51% { z-index: 10; } 
+            100% { transform: translateY(5px); z-index: 10; } /* Un poco más abajo */
+        }
+
+        .envelope-wrapper.closing .letter {
+            animation: closeLetter 1s var(--suave) forwards;
+        }
+
+        @keyframes closeLetter {
+            0% { transform: translateY(5px); z-index: 10; }
+            50% { transform: translateY(-215px); z-index: 10; }
+            51% { z-index: 2; } 
+            100% { transform: translateY(0); z-index: 2; }
+        }
+
+        .envelope-wrapper.closing .flap {
+            transform: rotateX(0deg);
+            /* La tapa empieza a bajar justo cuando la carta está entrando al sobre */
+            transition: transform 0.6s var(--suave) 0.7s, z-index 0.1s 1s;
+        }
+
+        .letter-content {
+            color: #333;
+            text-align: center;
+        }
+
+        .close-btn {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: var(--rojo-fondo);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .letter::-webkit-scrollbar { width: 4px; }
+        .letter::-webkit-scrollbar-thumb { background: var(--dorado); }
+    </style>
+</head>
+<body>
+
+<div class="envelope-wrapper" id="envelope">
+    <div class="flap"></div>
+    <div class="seal" onclick="openEnvelope()">❤️</div>
+
+    <div class="letter" id="letter">
+        <div class="letter-content">
+            <h3 style="color:var(--rojo-fondo); margin-top:0;">¡Feliz cumpleaños! 🎂</h3>
+            <p>Cabe destacar que tuve que modificar el texto después de tantos días luchando con esto. Aún así, no quería dejar pasar la oportunidad para desearte un muy feliz cumpleaños, Leoncito.</p>
+            <p>Espero que hayas pasado un día muy hermoso, más allá de todo lo que sabemos que anda sucediendo y que, probablemente, tampoco haya sido la mejor fecha como tal, lo importante es que pudiste estar rodeado de gente que te aprecia y ojalá eso se haya sostenido durante todos estos días.</p>
+            <p>Por otro lado, también quiero enviarte esta cartita para desearte muchísima felicidad y amor, obviamente que tranquilidad también, como ya es casi una costumbre desearte. Ojalá poder darte un abrazo gigante y hacer que tus días sean más amenos porque sos una persona hermosa, esa clase de gente por la que una se siente afortunada de haberse cruzado en el camino y no hay nada más que quisiera en este mundo que recibas todo el cariño y valor que te mereces. Por favor, no dejes que nadie te pase por encima y ojalá te mantengas fuerte y firme en esta actitud de alejarte de las malas energías, de no permitir que esas cosas te afecten y velar siempre por tu bienestar.</p>
+            <p>Te amo muchísimo y con toda la fuerza de mi corazón, espero poder conseguir la manera de hacerte llegar, aunque sea telepáticamente, todo este cariño que siento por vos y el agradecimiento por tenerte en mi vida y pasar otro cumpleaños más a tu lado. 🖤</p>
+            <button class="close-btn" onclick="closeEnvelope(event)">Cerrar</button>
+        </div>
+    </div>
+
+    <div class="envelope-back"></div>
+    <div class="envelope-front"></div>
+</div>
+
+<script>
+    const wrapper = document.getElementById('envelope');
+    const letter = document.getElementById('letter');
+
+    function openEnvelope() {
+        wrapper.classList.remove('closing');
+        wrapper.classList.add('open');
+    }
+
+    function closeEnvelope(e) {
+        e.stopPropagation();
+        wrapper.classList.remove('open');
+        wrapper.classList.add('closing');
+
+        setTimeout(() => {
+            letter.scrollTop = 0;
+            wrapper.classList.remove('closing');
+        }, 1400); // Tiempo ajustado a la nueva fluidez
+    }
+</script>
+
+</body>
+</html>
